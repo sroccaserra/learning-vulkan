@@ -1,25 +1,60 @@
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
 #include <iostream>
-#include <vulkan/vulkan.h>
+#include <stdexcept>
+#include <cstdlib>
 
-int main(int argc, const char * argv[]) {
-    VkInstance instance;
-    VkResult result;
-    VkInstanceCreateInfo info = {};
-    uint32_t instance_layer_count;
+const int WIDTH = 800;
+const int HEIGHT = 600;
 
-    result = vkEnumerateInstanceLayerProperties(&instance_layer_count, nullptr);
-    std::cout << instance_layer_count << " layers found!\n";
-    if (instance_layer_count > 0) {
-        std::unique_ptr<VkLayerProperties[]> instance_layers(new VkLayerProperties[instance_layer_count]);
-        result = vkEnumerateInstanceLayerProperties(&instance_layer_count, instance_layers.get());
-        for (int i = 0; i < instance_layer_count; ++i) {
-            std::cout << instance_layers[i].layerName << "\n";
+class HelloTriangleApplication {
+public:
+    void run() {
+        initWindow();
+        initVulkan();
+        mainLoop();
+        cleanup();
+    }
+
+private:
+    GLFWwindow* window;
+
+    void initWindow() {
+        glfwInit();
+
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+        window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
+    }
+
+    void initVulkan() {
+
+    }
+
+    void mainLoop() {
+        while (!glfwWindowShouldClose(window)) {
+            glfwPollEvents();
         }
     }
 
-    result = vkCreateInstance(&info, NULL, &instance);
-    std::cout << "vkCreateInstance result: " << result  << "\n";
+    void cleanup() {
+        glfwDestroyWindow(window);
 
-    vkDestroyInstance(instance, nullptr);
-    return 0;
+        glfwTerminate();
+    }
+};
+
+int main() {
+    HelloTriangleApplication app;
+
+    try {
+        app.run();
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
